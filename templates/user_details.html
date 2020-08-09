@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block title %} Create User {% endblock %} {% block
+content %}
+
+<div class="row">
+  <dv class="col-sm-10-12">
+    <h1>{{user.full_name}}</h1>
+    <form>
+      <button
+        class="btn btn-primary btn-sm"
+        formaction="/users/{{ user.id }}/edit"
+        formmethod="GET"
+      >
+        EDIT
+      </button>
+      <button
+        class="btn btn-danger btn-sm"
+        formaction="/users/{{ user.id }}/delete"
+        formmethod="POST"
+      >
+        DELETE USER
+      </button>
+    </form>
+
+    <a href="/">BACK HOME</a></dv
+  >
+</div>
+
+{% endblock %}
