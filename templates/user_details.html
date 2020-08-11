@@ -20,9 +20,28 @@ content %}
         DELETE USER
       </button>
     </form>
-
-    <a href="/">BACK HOME</a></dv
-  >
+    <br />
+    <h2>Posts</h2>
+    <ul>
+      {% for post in user.posts %}
+      <li>
+        <a href="/posts/{{ post.id }}">
+          {{post.title}} - {{post.friendly_date}}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    <form>
+      <button
+        class="btn btn-primary btn-sm"
+        formaction="/users/{{ user.id }}/posts/new"
+        formmethod="GET"
+      >
+        CREATE POST
+      </button>
+    </form>
+    <a href="/">BACK HOME</a>
+  </dv>
 </div>
 
 {% endblock %}
