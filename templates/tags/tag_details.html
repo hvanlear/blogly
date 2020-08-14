@@ -1,0 +1,10 @@
+{% extends 'base.html' %} {% block title %} Create User {% endblock %} {% block
+content %}
+
+<h1>#{{tag.name}} posts</h1>
+
+{% for tag_post in tag.posts %}
+
+<h3><a href="/posts/{{ tag_post.id }}">{{ tag_post.title }}</a></h3>
+
+{% endfor %} {% endblock %}

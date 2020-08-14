@@ -2,7 +2,7 @@
 block content %}
 
 <div class="container">
-  <h2>Create A New Post</h2>
+  <h2>AddPost</h2>
   <form action="" method="POST">
     <div class="form-group">
       <label for="exampleInputPassword1">Title</label>
@@ -11,6 +11,23 @@ block content %}
     <div class="form-group">
       <textarea name="content" class="form-control" id="post_content" rows="3">
       </textarea>
+    </div>
+
+    <div class="form-check">
+      {% for tag in tags %}
+      <div>
+        <input
+          type="checkbox"
+          class="form-check-input"
+          value="{{ tag.id }}"
+          id="tag_{{ tag.id }}"
+          name="tags"
+        />
+        <label class="form-check-label" for="tag_{{ tag.id }}">
+          {{ tag.name }}
+        </label>
+      </div>
+      {% endfor %}
     </div>
 
     <button>Submit Post</button>

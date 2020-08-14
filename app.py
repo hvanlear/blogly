@@ -1,4 +1,4 @@
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, request, redirect, render_template, flash
 
@@ -14,7 +14,9 @@ connect_db(app)
 @app.route('/')
 def root():
     """Homepage redirects to User List """
-    return redirect('/users')
+
+    posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+    return render_template('home.html', posts=posts)
 
 
 @app.route('/users')
@@ -25,7 +27,7 @@ def users_index():
 
 @app.route('/users/new', methods=["GET"])
 def users_new_form():
-    return render_template('create_user.html')
+    return render_template('users/create_user.html')
 
 
 @app.route('/users/new', methods=["POST"])
@@ -45,14 +47,14 @@ def create_new_user():
 def show_user(user_id):
     """show details about single user"""
     user = User.query.get_or_404(user_id)
-    return render_template('user_details.html', user=user)
+    return render_template('users/user_details.html', user=user)
 
 
 @app.route('/users/<int:user_id>/edit')
 def edit_user(user_id):
     """show user edit form"""
     user = User.query.get_or_404(user_id)
-    return render_template('edit_user.html', user=user)
+    return render_template('users/edit_user.html', user=user)
 
 
 @app.route('/users/<int:user_id>/edit', methods=['POST'])
@@ -83,25 +85,38 @@ def user_delete(user_id):
 @app.route('/users/<int:user_id>/posts/new', methods=["GET"])
 def new_post_form(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('create_post.html', user=user)
+    tags = Tag.query.all()
+    return render_template('posts/create_post.html', user=user, tags=tags)
 
 
 @app.route('/users/<int:user_id>/posts/new', methods=['POST'])
 def create_new_post(user_id):
     title = request.form['title']
     content = request.form['content']
-    new_post = Post(title=title, content=content, user_id=user_id)
+    tag_ids = [int(num) for num in request.form.getlist('tags')]
+    tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+    new_post = Post(title=title, content=content, user_id=user_id, tags=tags)
 
     db.session.add(new_post)
     db.session.commit()
+    flash(f"Post '{new_post.title}' added.")
     # fix this redirect
-    return redirect(f'/posts/{new_post.id}')
+    return redirect(f'/users/{user_id}')
 
 
 @app.route('/posts/<int:post_id>', methods=['GET'])
 def show_post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post_content.html', post=post)
+    return render_template('posts/post_content.html', post=post)
+
+
+@app.route('/posts/<int:post_id>/edit')
+def posts_edit(post_id):
+    """"show a form to edit an existing post"""
+
+    post = Post.query.get_or_404(post_id)
+    tags = Tag.query.all()
+    return render_template('posts/edit_post.html', post=post, tags=tags)
 
 
 @app.route('/posts/<int:post_id>/delete', methods=['POST'])
@@ -111,3 +126,21 @@ def delete_post(post_id):
     db.session.commit()
 
     return redirect('/users')
+
+######################## Tag Routes ###################################
+
+
+@app.route('/tags', methods=['GET'])
+def show_tags():
+    tags = Tag.query.order_by(Tag.name).all()
+    return render_template("tags.html", tags=tags)
+
+
+@app.route('/tags/<int:tag_id>', methods=['GET'])
+def tag_details(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    return render_template('tag_details.html', tag=tag)
+
+
+# @app.route('/tags/new')
+# def show_tag_form

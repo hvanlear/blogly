@@ -33,10 +33,26 @@ class Post(db.Model):
                            default=datetime.today)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship("User")
+    """Through reference to tags"""
+    tags = db.relationship(
+        'Tag', secondary='post_tag', backref='posts')
 
     @property
     def friendly_date(self):
         return self.created_at.strftime("%a %b %-d  %Y, %-I:%M %p")
+
+
+class PostTag(db.Model):
+    __tablename__ = 'post_tag'
+    post_id = db.Column(db.Integer, db.ForeignKey(
+        'posts.id'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+
+
+class Tag(db.Model):
+    __tablename__ = 'tags'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(10), nullable=False)
 
 
 # user = User(first_name ='Hunter', last_name = 'VL')
@@ -53,3 +69,11 @@ class Post(db.Model):
 
 # post1.user.first_name
 # post1.user.id
+
+
+# post = Post.query.get(1)
+# post.tags[1].name
+# post.tags[1].id
+
+# tag = Tag.query.get(2)
+# tag.posts[1].title
